@@ -1,0 +1,8 @@
+satisfied_w_education(no).
+satisfied_w_areaofwork(yes).
+qual(realistic).
+qual(artistic).
+qual(investigative).
+qual(social).
+qual(enterprising).
+qual(conventional).

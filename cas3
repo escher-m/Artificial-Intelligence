@@ -1,0 +1,374 @@
+/* 	Karishma Sinha
+	2018339
+	Career Advisory System
+*/
+
+%Initialization
+:-nl,tab(50),
+write("Welcome to Career Advisory System"),
+tab(50),nl,nl,tab(45),
+write("Answer questions to find out your advised career"),
+tab(40),nl,nl,tab(60),
+write("Enter to start"),tab(65),nl,nl,nl.
+	
+start:-
+	reset,
+	questions,!,find_careers.
+start :-
+	write('Can\'t find a career for you. Sorry! :('), nl.
+% 
+find_careers:-
+holland1,holland,nl,nl,code, position,jobs(_), findposition.
+
+holland1:- nl,nl,write("Your top qualities together determine the Holland Code."),nl,write('Your interests have been captured along the lines of the Holland Code which is used by psychologists all over the world for career counselling.'),nl,nl, write('HOLLAND CODE:').
+holland:-
+         open("/Users/karishma/Desktop/Sem5/AI/AI-A1-KarishmaSinha-2018339/trial/hollandcode.txt",read,Str),
+         read_code(Str,Code),
+         close(Str),
+         write(Code),  nl.
+   
+   read_code(Stream,[]):-
+         at_end_of_stream(Stream).
+   
+   read_code(Stream,[X|L]):-
+         \+  at_end_of_stream(Stream),
+         read(Stream,X),
+         read_code(Stream,L).
+
+code:-
+	nl,write("With the help of your responses, the Career Advisory System will suggest a suitable job as well as professional position for you."),nl,nl.
+
+
+position:-
+	consult("/Users/karishma/Desktop/Sem5/AI/AI-A1-KarishmaSinha-2018339/trial/HollandQualitiesPrologfacts.txt").
+
+findposition:- forall(qual(X), description(X)).
+
+description(realistic):-
+	write('You will do well in planning goals.'),nl.
+
+description(investigative):-
+	write('You will do in doing in-depth work.'),nl.
+
+description(artistic):-
+	write('You will do well in finding unique solutions.'),nl.
+
+description(social):-
+	write('You will do well in doing work that gives back to society.'),nl.
+
+description(enterprising):-
+	write('You will do well creating profits.'),nl.
+
+description(conventional):-
+	write('You will do well in day to day activities.'),nl.
+
+jobs(X):-
+	job(X),description(X),assert(recommended_career(X)),fail.
+	jobs(_):-
+	nl, convert_to_list(List), write('The list of recommended careers for you are '), write(List), nl.
+
+convert_to_list([Px|Tail]):- retract(recommended_career(Px)), convert_to_list(Tail).
+convert_to_list([]).
+
+
+:- dynamic(response/2).
+
+reset:-
+	retractall(response(_,_)).
+reset.
+
+questions:-
+	write('What is your CGPA?'), nl,read(X),assert(cgpa(X)),
+	write('What is your Aptitude Score (Out of 100)?'), nl,read(Y),assert(aptitude_score(Y)),
+	write('What is your stream?		(cse/csam/csd/csss/csb/ece)'), nl,read(Z),assert(stream(Z)),
+	write('Which domain have you interned it?	(cs/ssh/ece/research/none)'), nl,read(A),assert(internship(A)),
+	write('Which domain have you made projects in?	(cs/ssh/ece/research/none)'), nl,read(B),assert(project(B)),
+	write('Which domain have you done a BTP/IP/IS in?	(cs/ssh/ece/research/none)'), nl,read(C),assert(study(C)),
+	write('Which subject do you have a minor in?	(eco/bio/ent/none)'), nl,read(D),assert(minor(D)),
+	write('Did you graduate with honours?	(yes/no)'), nl,read(E),assert(honours(E)).
+
+%	write('Are you satisfied with your educational qualification?	(yes/no)'), nl, read(F),assert(satisfied_w_education(F)),
+%	write('Are you satisfied with your area of work?	(yes/no)'), nl,read(G),assert(satisfied_w_areaofwork(G)).
+
+job(software_developer) :-
+	satisfied_w_education(yes),
+	(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),
+	cgpa(X),X@>=7,
+	aptitude_score(Y),Y@>=70.
+
+
+
+job(computer_hardware_engineer) :-
+	satisfied_w_education(yes),
+	stream(ece),
+	cgpa(X),X@>=7,
+	aptitude_score(Y),Y@>=70.
+
+
+job(computer_systems_analyst) :-
+	satisfied_w_education(yes),
+	(stream(cse);stream(csam);stream(csss);stream(csd);stream(csb);stream(ece)),
+	cgpa(X),X@>=7,
+	aptitude_score(Y),Y@>=40.
+
+job(data_scientist) :-
+	satisfied_w_education(yes),
+	(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),
+	cgpa(X),X@>=8,
+	aptitude_score(Y),Y@>=90.
+
+job(research_scientist) :-
+	stream(csss),cgpa(X),X@>=8,aptitude_score(Y),Y@>=90.
+
+job(data_analyst) :-
+	satisfied_w_education(yes),
+	(stream(cse);stream(csam)),
+	cgpa(X),X@>=8,
+	aptitude_score(Y),Y@>=80.
+job(database_administrator) :-
+	satisfied_w_education(yes),
+	(stream(cse);stream(csam);stream(csss);stream(csb);stream(ece);stream(csd)),
+	cgpa(X),X@>=5,
+	aptitude_score(Y),Y@>=50.
+
+job(graphic_designer) :-
+	satisfied_w_education(yes),
+	stream(csd),
+	cgpa(X),X@>=6.
+
+
+job(ux_designer) :-
+	satisfied_w_education(yes),
+	stream(csd),
+	cgpa(X),X@>=6.
+
+job(multimedia_animator) :-
+	satisfied_w_education(yes),
+	stream(csd),
+	cgpa(X),X@>=6.
+
+job(video_editor) :-
+	satisfied_w_education(yes),
+	stream(csd),
+	cgpa(X),X@>=6.
+
+job(bioinformatics_engineer) :-
+	satisfied_w_education(yes),
+	((stream(cse),minor(bio));(stream(csam),minor(bio));(stream(csss),minor(bio));stream(csb);(stream(csd),minor(bio))),
+	cgpa(X),X@>=6,
+	aptitude_score(Y),Y@>=50.
+
+job(computational_biologist) :-
+	satisfied_w_education(yes),((stream(cse),minor(bio));(stream(csam),minor(bio));(stream(csss),minor(bio));stream(csb);(stream(csd),minor(bio))),
+	cgpa(X),X@>=6,
+	aptitude_score(Y),Y@>=50.
+
+job(bioinformatics_analyst) :-
+	satisfied_w_education(yes),((stream(cse),minor(bio));(stream(csam),minor(bio));(stream(csss),minor(bio));stream(csb);(stream(csd),minor(bio))),
+	cgpa(X),X@>=6,
+	aptitude_score(Y),Y@>=50.
+
+
+job(electronics_engineer) :-
+	satisfied_w_education(yes),
+	stream(ece),
+	cgpa(X),X@>=5,
+	aptitude_score(Y),Y@>=40.
+
+job(electronicsdesign_engineer) :-
+	satisfied_w_education(yes),
+	stream(ece),
+	cgpa(X),X@>=5,
+	aptitude_score(Y),Y@>=40.
+
+job(communications_engineer) :-
+	satisfied_w_education(yes),
+	stream(ece),
+	cgpa(X), X@>=5,
+	aptitude_score(Y),Y@>=40.
+
+job(networkplanning_engineer) :-
+	satisfied_w_education(yes),
+	stream(ece),
+	cgpa(X),X@>=5,
+	aptitude_score(Y),Y@>=40.
+
+job(ms_ml) :-
+	satisfied_w_education(no), 
+	satisfied_w_areaofwork(yes),
+	(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),
+	(project(cs);internship(cs);study(cs)),
+	cgpa(X),X@>=8,
+	aptitude_score(Y),Y@>=70.
+
+job(ms_ai) :-
+	satisfied_w_education(no), 
+	satisfied_w_areaofwork(yes),
+	(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),
+	(project(cs);internship(cs);study(cs)),
+	cgpa(X),X@>=8,
+	aptitude_score(Y),Y@>=70.
+
+job(ms_fullstackdevelopement) :-
+satisfied_w_education(no), satisfied_w_areaofwork(yes),(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),(project(cs);internship(cs);study(cs)),cgpa(X),X@>=8,aptitude_score(Y),Y@>=70.
+
+job(ms_datascience) :-
+satisfied_w_education(no), satisfied_w_areaofwork(yes),(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),(project(cs);internship(cs);study(cs)),cgpa(X),X@>=8,aptitude_score(Y),Y@>=70.
+
+job(ms_economics) :-
+satisfied_w_education(no), satisfied_w_areaofwork(yes),((stream(cse),minor(eco));(stream(csam),minor(eco));stream(csss);(stream(csb),minor(eco));(stream(csd),minor(eco))),(project(ssh);internship(ssh);study(ssh)),cgpa(X),X@>=5.
+
+job(ms_business) :-
+satisfied_w_education(no), satisfied_w_areaofwork(yes),((stream(cse),minor(eco));(stream(csam),minor(eco));stream(csss);(stream(csb),minor(eco));(stream(csd),minor(eco))),(project(ssh);internship(ssh);study(ssh)),cgpa(X),X@>=5.
+
+job(ms_pyschology) :-
+satisfied_w_education(no), satisfied_w_areaofwork(yes),(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),(project(ssh);internship(ssh);study(ssh)),cgpa(X),X@>=5.
+
+job(ms_sociology) :-
+satisfied_w_education(no), satisfied_w_areaofwork(yes),(stream(cse);stream(csam);stream(csss);stream(csb);stream(csd)),(project(ssh);internship(ssh);study(ssh)),cgpa(X),X@>=5.
+
+job(ms_maths) :-
+satisfied_w_education(no), satisfied_w_areaofwork(yes),stream(csam),cgpa(X),X@>=6.
+
+job(mba_finance) :-
+satisfied_w_education(no), satisfied_w_areaofwork(no),stream(csam),cgpa(X),X@>=8.
+
+job(mba_hr) :-
+satisfied_w_education(no), satisfied_w_areaofwork(no),stream(csss),cgpa(X),X@>=8.
+
+job(mba_logistics) :-
+satisfied_w_education(no), satisfied_w_areaofwork(no),cgpa(X),X@>=8.
+
+job(mba_healthcare) :-
+satisfied_w_education(no), satisfied_w_areaofwork(no),stream(csb),cgpa(X),X@>=8.
+
+job(mba_business) :-
+satisfied_w_education(no), satisfied_w_areaofwork(no),cgpa(X),X@>=8.
+
+job(civil_services) :-
+satisfied_w_education(yes), satisfied_w_areaofwork(no),aptitude_score(X),X@>=80.
+
+job(arts) :-
+satisfied_w_education(yes), satisfied_w_areaofwork(no).
+
+
+
+
+
+description(software_developer) :-
+	write('Software Developer'), nl,
+	write('Your interest in your CS field and high academic performance and high aptitude score make a you a good candidate for Software Development'),nl.
+
+description(database_administrator) :-
+	write('Database administrator'), nl,
+	write('Your interest in your CS field and high academic performance make a you a good candidate for Database Administrator'),nl.
+
+description(computer_hardware_engineer) :-
+	write('Computer hardware engineer'), nl,
+	write('Your interest in your CS field makes a you a good candidate for Computer Hardware Engineer'),nl.
+
+description(computer_systems_analyst) :-
+	write('Computer systems analyst'), nl,
+	write('Your interest in your CS field and high academic performance make a you a good candidate for Computer Systems Analyst'),nl.
+
+description(data_scientist) :-
+	write('Data Scientist'), nl
+	,
+	write('Your interest in your CS field and high academic performance make a you a good candidate for Data Scientist'),nl.
+
+description(research_scientist) :-
+	write('Research Scientist'), nl,
+	write('Your interest in your CS field and high academic performance make a you a good candidate for and interest in research make you a good fit for research scientist'),nl.
+
+description(data_analyst) :-
+	write('Data Analyst'), nl,
+	write('Your interest in your CS field and high academic performance make a you a good candidate for Data Analyst'),nl.
+
+description(graphic_designer) :-
+	write('Graphic Designer'), nl,
+	write('Your interest in your Design field would pay off in the role of Graphic Designer'),nl.
+
+description(ux_designer) :-
+	write('UX designer'), nl,
+	write('Your interest in your Design field would pay off in the role of UX (user Experience) Designer'),nl.
+
+description(multimedia_animator) :-
+	write('Multimedia Animator'), nl,
+	write('Your interest in your Design field would pay off in the role of Multimedia Animator'),nl.
+
+description(video_editor) :-
+	write('Video Editor'), nl,
+	write('Your interest in your Design field would pay off in the role of Video Editor'),nl.
+
+description(bioinformatics_engineer) :-
+	write('Bioinfomatics Engineer'), nl.
+
+description(computational_biologist) :-
+	write('Computational Biologist'), nl.
+
+description(bioinformatics_analyst) :-
+	write('Bioinfomatics Analyst'), nl.
+
+description(electronics_engineer) :-
+	write('Electronics Engineer'), nl.
+
+description(electronicsdesign_engineer) :-
+	write('Electronics Design Engineer'), nl.
+
+description(communications_engineer) :-
+	write('Communications Engineer'), nl.
+
+description(networkplanning_engineer) :-
+	write('Network Planning Engineer'), nl.
+
+description(ms_ml) :-
+	write('Masters in ML'), nl.
+
+description(ms_ai) :-
+	write('Masters in AI'), nl.
+
+description(ms_fullstackdevelopment) :-
+	write('Masters in Full Stack Software Development'), nl.
+
+description(ms_datascience) :-
+	write('Masters in Data Science'), nl.
+
+description(ms_economics) :-
+	write('Masters in Economics'), nl.
+
+description(ms_business) :-
+	write('Masters in Business'), nl.
+
+description(ms_psychology) :-
+	write('Masters in Psychology'), nl.
+
+description(ms_sociology) :-
+	write('Masters in Sociology'), nl.
+
+description(ms_maths) :-
+	write('Masters in Maths'), nl.
+
+description(mba_finance) :-
+	write('MBA in Finance'), nl.
+
+description(mba_hr) :-
+	write('MBA in HR'), nl.
+
+description(mba_logistics) :-
+	write('MBA in Logistics'), nl.
+
+description(mba_healthcare) :-
+	write('MBA in healthcare'), nl.
+
+description(mba_business) :-
+	write('MBA in Business'), nl.
+
+description(civil_services) :-
+	write('Civil Services'), nl.
+description(arts) :-
+	write('Explore other options'), nl.
+
+
+
+
+
